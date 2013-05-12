@@ -29,19 +29,19 @@
 
 #include <algorithm>
 #include "sais.hxx"
-#include "esary.hpp"
+#include "cppesary.hpp"
 
 
 namespace esary {
 
-  ESary::ESary(){
+  CPPESary::CPPESary(){
   }
 
-  ESary::~ESary(){
+  CPPESary::~CPPESary(){
   }
 
 
-  void ESary::addLine(const char* line){
+  void CPPESary::addLine(const char* line){
     //from http://shogo82148.hatenablog.com/entry/20110916/1316172382
     UnicodeString str(line, "UTF-8");
     StringCharacterIterator it(str);
@@ -52,7 +52,7 @@ namespace esary {
     T.push_back(1);//add Delimiter
   }
 
-  int ESary::build(){
+  int CPPESary::build(){
     int n = T.size();
     if(n==0)return -1;
     nodeNum = 0;
@@ -85,12 +85,7 @@ namespace esary {
     return 0;
   }
 
-
-  const std::vector<UChar32>& ESary::getT(){
-    return T;
-  }
-
-  void ESary::getResult(const std::vector<uint_32_t>& indexes,std::vector<std::string> & result){
+  void CPPESary::getResult(const std::vector<uint_32_t>& indexes,std::vector<std::string> & result){
     result.clear();
     for (std::vector<uint_32_t>::iterator it = indexes.begin(); it != indexes.end(); ++it) {
       result.push_back(getLine(*it));
@@ -98,7 +93,7 @@ namespace esary {
   }
 
 
-  std::string ESary::getLine(uint_32_t index){
+  std::string CPPESary::getLine(uint_32_t index){
     int start_idx;
     int end_idx;
     //search backward
@@ -128,7 +123,7 @@ namespace esary {
     return s;
   }
 
-  void ESary::search(const char* query, std::vector<uint_32_t>& indexes){
+  void CPPESary::search(const char* query, std::vector<uint_32_t>& indexes){
     UnicodeString str(query, "UTF-8");
     StringCharacterIterator it(str);
     std::vector<UChar32> queryVec;
@@ -172,7 +167,7 @@ namespace esary {
   }
 
   /// Return -1 if text[ind...] < query, or return 1 otherwise
-  int ESary::compare(const uint32_t ind, const vector<UChar32>& query, uint32_t& match) const{
+  int CPPESary::compare(const uint32_t ind, const vector<UChar32>& query, uint32_t& match) const{
     while (match < query.size() && match + ind < T.size()){
       if (T[ind+match] != query[match]){
         return (int)T[ind+match] - query[match];
@@ -186,7 +181,7 @@ namespace esary {
     }
   }
 
-  void ESary::bsearch(const vector<UChar32>& query,
+  void CPPESary::bsearch(const vector<UChar32>& query,
                       uint32_t& beg, uint32_t& half, uint32_t& size, 
                       uint32_t& match, uint32_t& lmatch, uint32_t& rmatch, 
                       const int state){
@@ -207,7 +202,7 @@ namespace esary {
     }
   }
 
-  int ESary::save(const char* fileName){
+  int CPPESary::save(const char* fileName){
     std::ofstream ofs(fileName);
     if (!ofs){
       what_ << "cannot open " << fileName;
@@ -222,7 +217,7 @@ namespace esary {
     return 0;
   }
 
-  int ESary::load(const char* fileName){
+  int CPPESary::load(const char* fileName){
     ifstream ifs(fileName);
     if (!ifs){
       what_ << "cannot open " << fileName;

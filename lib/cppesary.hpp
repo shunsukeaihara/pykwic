@@ -28,8 +28,8 @@
 */
 
 
-#ifndef ESARY_H_
-#define ESARY_H_
+#ifndef CPP_ESARY_H_
+#define CPP_ESARY_H_
 
 #include <vector>
 #include <string>
@@ -43,10 +43,10 @@
 
 namespace esary{
 
-  class ESary{
+  class CPPESary{
   publc:
-    ESary();
-    ~ESary();
+    CPPESary();
+    ~CPPESary();
     void addLine(const char* line);
     int build();
     void search(const char* query, std::vector<uint_32_t>& indexes);
@@ -54,8 +54,6 @@ namespace esary{
 
     int load();
     int save(const char* fileName);
-
-    const std::vector<UChar32>& getT();
 
   private:
 
@@ -116,8 +114,8 @@ namespace esary{
       return 0;
     }
 
-  } //ESary
+  } //CPPESary
 } //esary
 
 
-#endif  // ESARY_H_
+#endif  // CPP_ESARY_H_
