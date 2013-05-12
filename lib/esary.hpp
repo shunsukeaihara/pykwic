@@ -43,20 +43,20 @@
 
 namespace esary{
 
-  class CPPESary{
+  class ESary{
   publc:
-    CPPESary();
-    ~CPPESary();
+    ESary();
+    ~ESary();
     void addLine(const char* line);
     int build();
     void search(const char* query, std::vector<uint_32_t>& indexes);
     void getResult(const std::vector<uint_32_t>& indexes, std::vector<std::string>& result);
+    void getResultSuffix(const std::vector<uint_32_t>& indexes, std::vector<std::string>& result);
 
     int load();
     int save(const char* fileName);
 
   private:
-
     std::vector<UChar32> T;
     std::set<Uchar32> Term;
     std::vector<uint32_t>  SA;     // suffix array
@@ -73,6 +73,7 @@ namespace esary{
     int compare(const uint32_t ind, const vector<UChar32>& query, uint32_t& match) const;
 
     std::string getLine(uint_32_t index);
+    std::string getLineSuffix(uint_32_t index);
 
     template<class T> int write(const std::vector<T>& v, const char* vname, std::ofstream& ofs){
       uint32_t size = static_cast<uint32_t>(v.size());
@@ -114,7 +115,7 @@ namespace esary{
       return 0;
     }
 
-  } //CPPESary
+  } //ESary
 } //esary
 
 
