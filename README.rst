@@ -8,7 +8,7 @@ Based on *esa.hxx* and *sais.hxx*.
 Authors & Contributors
 ----------------------
 
-* Shunsuke Aihara <s.aihara@gmail.com>
+* Shunsuke Aihara - http://argmax.jp
 
 This module is based on *esa.hxx* by Daisuke Okanohara and *sais.hxx* by Yuta Mori.
 
