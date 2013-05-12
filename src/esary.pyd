@@ -1,0 +1,13 @@
+from libcpp.string cimport string
+from libcpp.vector cimport vector
+
+cdef extern from "../lib/esary.hpp" namespace "esary" nogil:
+     cdef cppclass ESary:
+          ESary()
+          void addLine(char *line)
+          int build()
+          void search(char *query, vector[int]& indexes)
+          void getResult(vector[int] &indexes, vector[string] &result)
+          void getResultSuffix(vector[int] &indexes, vector[string] &result)
+          int load(char *fileName)
+          int save(char *fileName)

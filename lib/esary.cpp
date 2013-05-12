@@ -92,7 +92,7 @@ namespace esary {
     }
   }
 
-  std::string ESary::getLine(uint_32_t index){
+  std::string ESary::getLine(const uint_32_t index){
     int start_idx;
     int end_idx;
     //search backward
@@ -131,7 +131,7 @@ namespace esary {
     }
   }
 
-  std::string ESary::getLineSuffix(uint_32_t index){
+  std::string ESary::getLineSuffix(const uint_32_t index){
     int end_idx;
     //search forward
     for(end_idx=index;end_idx<T.size();++end_idx){

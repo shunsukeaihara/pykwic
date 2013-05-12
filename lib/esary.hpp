@@ -53,7 +53,7 @@ namespace esary{
     void getResult(const std::vector<uint_32_t>& indexes, std::vector<std::string>& result);
     void getResultSuffix(const std::vector<uint_32_t>& indexes, std::vector<std::string>& result);
 
-    int load();
+    int load(const char* fileName);
     int save(const char* fileName);
 
   private:
@@ -72,8 +72,8 @@ namespace esary{
                  const int state);
     int compare(const uint32_t ind, const vector<UChar32>& query, uint32_t& match) const;
 
-    std::string getLine(uint_32_t index);
-    std::string getLineSuffix(uint_32_t index);
+    std::string getLine(const uint_32_t index);
+    std::string getLineSuffix(const uint_32_t index);
 
     template<class T> int write(const std::vector<T>& v, const char* vname, std::ofstream& ofs){
       uint32_t size = static_cast<uint32_t>(v.size());
