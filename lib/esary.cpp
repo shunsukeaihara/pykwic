@@ -29,8 +29,8 @@
 
 #include <algorithm>
 #include "sais.hxx"
+#include "esa.hxx"
 #include "esary.hpp"
-
 
 namespace esary {
 
@@ -56,10 +56,11 @@ namespace esary {
     int n = T.size();
     if(n==0)return -1;
     nodeNum = 0;
-    if(Term.size==0){
-      int alphaSize = 0x110000;
+    int alphaSize;
+    if(Term.size()==0){
+      alphaSize = 0x110000;
     }else{
-      int alphaSize = Term.size()+1;  // TermSize
+      alphaSize = Term.size()+1;  // TermSize
     }
     SA.clear();
     SA.resize(n);
@@ -85,20 +86,20 @@ namespace esary {
     return 0;
   }
 
-  void ESary::getResult(const std::vector<uint_32_t>& indexes,std::vector<std::string> & result){
+  void ESary::getResult(std::vector<uint32_t>& indexes, std::vector<std::string> & result){
     result.clear();
-    for (std::vector<uint_32_t>::iterator it = indexes.begin(); it != indexes.end(); ++it) {
+    for (std::vector<uint32_t>::iterator it = indexes.begin(); it != indexes.end(); ++it) {
       result.push_back(getLine(*it));
     }
   }
 
-  std::string ESary::getLine(const uint_32_t index){
-    int start_idx;
-    int end_idx;
+  std::string ESary::getLine(const uint32_t index){
+    uint32_t start_idx;
+    uint32_t end_idx;
     //search backward
-    for(start_idx=index;idx>=0;--start_idx){
+    for(start_idx=index;start_idx>=0;--start_idx){
       if(T[start_idx]==1){
-        --start__idx;
+        --start_idx;
         break;
       }
     }
@@ -110,7 +111,7 @@ namespace esary {
       }
     }
     UnicodeString us;
-    for(int i =start_idx;i<=end_idx;++i){
+    for(uint32_t i =start_idx;i<=end_idx;++i){
       us+=T[i];
     }
 
@@ -124,15 +125,15 @@ namespace esary {
 
 
 
-  void ESary::getResultSuffix(const std::vector<uint_32_t>& indexes,std::vector<std::string> & result){
+  void ESary::getResultSuffix(std::vector<uint32_t>& indexes,std::vector<std::string> & result){
     result.clear();
-    for (std::vector<uint_32_t>::iterator it = indexes.begin(); it != indexes.end(); ++it) {
+    for (std::vector<uint32_t>::iterator it = indexes.begin(); it != indexes.end(); ++it) {
       result.push_back(getLineSuffix(*it));
     }
   }
 
-  std::string ESary::getLineSuffix(const uint_32_t index){
-    int end_idx;
+  std::string ESary::getLineSuffix(const uint32_t index){
+    uint32_t end_idx;
     //search forward
     for(end_idx=index;end_idx<T.size();++end_idx){
       if(T[end_idx]==1){
@@ -141,7 +142,7 @@ namespace esary {
       }
     }
     UnicodeString us;
-    for(int i =index;i<=end_idx;++i){
+    for(uint32_t i =index;i<=end_idx;++i){
       us+=T[i];
     }
     int32_t convertedLength = us.extract(0, us.length(), 0, "UTF-8");
@@ -153,7 +154,7 @@ namespace esary {
   }
 
 
-  void ESary::search(const char* query, std::vector<uint_32_t>& indexes){
+  void ESary::search(const char* query, std::vector<uint32_t>& indexes){
     UnicodeString str(query, "UTF-8");
     StringCharacterIterator it(str);
     std::vector<UChar32> queryVec;
@@ -178,7 +179,7 @@ namespace esary {
     uint32_t llmatch = lmatch;
     uint32_t lrmatch = match;
     uint32_t lmatch2 = 0;
-    bsearch(query, lbeg, lhalf, lsize, lmatch2, llmatch, lrmatch, 1);
+    bsearch(queryVec, lbeg, lhalf, lsize, lmatch2, llmatch, lrmatch, 1);
 
   // Upper Bound
     uint32_t rbeg    = beg + half + 1;
@@ -197,7 +198,7 @@ namespace esary {
   }
 
   /// Return -1 if text[ind...] < query, or return 1 otherwise
-  int ESary::compare(const uint32_t ind, const vector<UChar32>& query, uint32_t& match) const{
+  int ESary::compare(const uint32_t ind, const std::vector<UChar32>& query, uint32_t& match) const{
     while (match < query.size() && match + ind < T.size()){
       if (T[ind+match] != query[match]){
         return (int)T[ind+match] - query[match];
@@ -211,13 +212,13 @@ namespace esary {
     }
   }
 
-  void ESary::bsearch(const vector<UChar32>& query,
+  void ESary::bsearch(const std::vector<UChar32>& query,
                       uint32_t& beg, uint32_t& half, uint32_t& size, 
                       uint32_t& match, uint32_t& lmatch, uint32_t& rmatch, 
                       const int state){
     half = size/2;
     for (; size > 0; size = half, half /= 2){
-      match = min(lmatch, rmatch);
+      match = std::min(lmatch, rmatch);
       int r = compare(SA[beg + half], query, match);
       if (r < 0 || (r == 0 && state==2)){
         beg += half + 1;
@@ -248,7 +249,7 @@ namespace esary {
   }
 
   int ESary::load(const char* fileName){
-    ifstream ifs(fileName);
+    std::ifstream ifs(fileName);
     if (!ifs){
       what_ << "cannot open " << fileName;
       return -1;

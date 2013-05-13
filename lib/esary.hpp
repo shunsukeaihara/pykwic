@@ -31,10 +31,12 @@
 #ifndef CPP_ESARY_H_
 #define CPP_ESARY_H_
 
+#include "stdint.h"
 #include <vector>
 #include <string>
 #include <set>
 #include <fstream>
+#include <sstream>
 
 #include <unicode/unistr.h>
 #include <unicode/uchar.h>
@@ -44,36 +46,37 @@
 namespace esary{
 
   class ESary{
-  publc:
+  public:
     ESary();
     ~ESary();
     void addLine(const char* line);
     int build();
-    void search(const char* query, std::vector<uint_32_t>& indexes);
-    void getResult(const std::vector<uint_32_t>& indexes, std::vector<std::string>& result);
-    void getResultSuffix(const std::vector<uint_32_t>& indexes, std::vector<std::string>& result);
+    void search(const char* query, std::vector<uint32_t>& indexes);
+    void getResult(std::vector<uint32_t>& indexes, std::vector<std::string>& result);
+    void getResultSuffix(std::vector<uint32_t>& indexes, std::vector<std::string>& result);
 
     int load(const char* fileName);
     int save(const char* fileName);
 
   private:
     std::vector<UChar32> T;
-    std::set<Uchar32> Term;
+    std::set<UChar32> Term;
     std::vector<uint32_t>  SA;     // suffix array
     std::vector<uint32_t>  L;     // left boundaries of internal node
     std::vector<uint32_t>  R;     // right boundaries of internal node 
     std::vector<uint32_t>  D;     // depths of internal node
-    std::vector<uint_32_t> RANK;
+    std::vector<uint32_t> RANK;
     int nodeNum;
+    std::ostringstream what_;
 
-    void bsearch(const vector<UChar32>& query,
+    void bsearch(const std::vector<UChar32>& query,
                  uint32_t& beg, uint32_t& half, uint32_t& size,
                  uint32_t& match, uint32_t& lmatch, uint32_t& rmatch,
                  const int state);
-    int compare(const uint32_t ind, const vector<UChar32>& query, uint32_t& match) const;
+    int compare(const uint32_t ind, const std::vector<UChar32>& query, uint32_t& match) const;
 
-    std::string getLine(const uint_32_t index);
-    std::string getLineSuffix(const uint_32_t index);
+    std::string getLine(const uint32_t index);
+    std::string getLineSuffix(const uint32_t index);
 
     template<class T> int write(const std::vector<T>& v, const char* vname, std::ofstream& ofs){
       uint32_t size = static_cast<uint32_t>(v.size());
@@ -115,7 +118,7 @@ namespace esary{
       return 0;
     }
 
-  } //ESary
+  }; //ESary
 } //esary
 
 
