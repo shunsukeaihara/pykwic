@@ -31,6 +31,7 @@
 #include "sais.hxx"
 #include "esa.hxx"
 #include "esary.hpp"
+#include <iostream>
 
 namespace esary {
 
@@ -47,7 +48,6 @@ namespace esary {
     StringCharacterIterator it(str);
     for(UChar32 uc = it.first32(); uc != it.DONE; uc = it.next32()) {
       T.push_back(uc);
-      Term.insert(uc);
     }
     T.push_back(1);//add Delimiter
   }
@@ -56,12 +56,8 @@ namespace esary {
     int n = T.size();
     if(n==0)return -1;
     nodeNum = 0;
-    int alphaSize;
-    if(Term.size()==0){
-      alphaSize = 0x110000;
-    }else{
-      alphaSize = Term.size()+1;  // TermSize
-    }
+    int alphaSize = 0x110000;
+
     SA.clear();
     SA.resize(n);
     L.clear();
@@ -86,32 +82,29 @@ namespace esary {
     return 0;
   }
 
-  void ESary::getResult(std::vector<uint32_t>& indexes, std::vector<std::string> & result){
+  void ESary::getResult(std::vector<uint32_t>& indexes, std::vector<std::pair<std::string,std::string> > & result){
     result.clear();
     for (std::vector<uint32_t>::iterator it = indexes.begin(); it != indexes.end(); ++it) {
-      result.push_back(getLine(*it));
+      result.push_back(std::pair<std::string,std::string>(getPrefix(*it),getSuffix(*it)));
     }
   }
 
-  std::string ESary::getLine(const uint32_t index){
-    uint32_t start_idx;
-    uint32_t end_idx;
+  std::string ESary::getPrefix(const uint32_t index){
+    uint32_t start_idx = index;
     //search backward
-    for(start_idx=index;start_idx>=0;--start_idx){
+    for(;start_idx>0;--start_idx){
       if(T[start_idx]==1){
-        --start_idx;
+        ++start_idx;
         break;
       }
     }
-    //search forward
-    for(end_idx=index;end_idx<T.size();++end_idx){
-      if(T[end_idx]==1){
-        --end_idx;
-        break;
-      }
+
+    if(start_idx>=index){
+      return "";
     }
+
     UnicodeString us;
-    for(uint32_t i =start_idx;i<=end_idx;++i){
+    for(uint32_t i =start_idx;i<index;++i){
       us+=T[i];
     }
 
@@ -128,11 +121,11 @@ namespace esary {
   void ESary::getResultSuffix(std::vector<uint32_t>& indexes,std::vector<std::string> & result){
     result.clear();
     for (std::vector<uint32_t>::iterator it = indexes.begin(); it != indexes.end(); ++it) {
-      result.push_back(getLineSuffix(*it));
+      result.push_back(getSuffix(*it));
     }
   }
 
-  std::string ESary::getLineSuffix(const uint32_t index){
+  std::string ESary::getSuffix(const uint32_t index){
     uint32_t end_idx;
     //search forward
     for(end_idx=index;end_idx<T.size();++end_idx){

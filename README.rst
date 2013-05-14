@@ -1,7 +1,7 @@
-pyesary
+pykwic
 ===========
 
-Suffix Array Library for unicode text.
+KWIC Library for unicode text using Suffix Array.
 
 Based on *esa.hxx* and *sais.hxx*.
 

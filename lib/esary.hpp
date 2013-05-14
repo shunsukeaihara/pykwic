@@ -34,7 +34,6 @@
 #include "stdint.h"
 #include <vector>
 #include <string>
-#include <set>
 #include <fstream>
 #include <sstream>
 
@@ -52,7 +51,7 @@ namespace esary{
     void addLine(const char* line);
     int build();
     void search(const char* query, std::vector<uint32_t>& indexes);
-    void getResult(std::vector<uint32_t>& indexes, std::vector<std::string>& result);
+    void getResult(std::vector<uint32_t>& indexes, std::vector<std::pair<std::string,std::string> > & result);
     void getResultSuffix(std::vector<uint32_t>& indexes, std::vector<std::string>& result);
 
     int load(const char* fileName);
@@ -60,7 +59,6 @@ namespace esary{
 
   private:
     std::vector<UChar32> T;
-    std::set<UChar32> Term;
     std::vector<uint32_t>  SA;     // suffix array
     std::vector<uint32_t>  L;     // left boundaries of internal node
     std::vector<uint32_t>  R;     // right boundaries of internal node 
@@ -75,8 +73,8 @@ namespace esary{
                  const int state);
     int compare(const uint32_t ind, const std::vector<UChar32>& query, uint32_t& match) const;
 
-    std::string getLine(const uint32_t index);
-    std::string getLineSuffix(const uint32_t index);
+    std::string getPrefix(const uint32_t index);
+    std::string getSuffix(const uint32_t index);
 
     template<class T> int write(const std::vector<T>& v, const char* vname, std::ofstream& ofs){
       uint32_t size = static_cast<uint32_t>(v.size());
