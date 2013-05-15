@@ -3,6 +3,7 @@ import pykwic
 import nose
 import hashlib
 import os
+import random
 from  datetime import datetime
 class TestKwicBase():
 
@@ -10,6 +11,8 @@ class TestKwicBase():
         self._kwic=pykwic.Kwic()
         self._kwic.add_line(u"うなぎうなうなうなぎなう")
         self._kwic.add_line(u"うらにわににわうなにわとりがいる")
+        for i in xrange(10000):
+            self._kwic.add_line(u"".join([unichr(random.randint(1,10000)) for i in range(random.randint(10,30))]))
         self._kwic.build()
 
     def teardown(self):
