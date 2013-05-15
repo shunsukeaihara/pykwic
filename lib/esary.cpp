@@ -52,6 +52,10 @@ namespace esary {
   }
 
   int ESary::build(){
+    return build_sa();
+  }
+
+  int ESary::build_esa(){
     int n = T.size();
     if(n==0)return -1;
     nodeNum = 0;
@@ -78,6 +82,24 @@ namespace esary {
       if(i==0 || T[(SA[i]+n-1)%n] != T[(SA[i-1]+n-1)%n]) r++;
       RANK[i] = r;
    }
+    return 0;
+  }
+
+  int ESary::build_sa(){
+    int n = T.size();
+    if(n==0)return -1;
+    nodeNum = 0;
+    int alphaSize = 0x110000;
+
+    SA.clear();
+    SA.resize(n);
+    L.clear();
+    R.clear();
+    D.clear();
+    if (saisxx(T.begin(), SA.begin(),
+              n, alphaSize) == -1){
+      return -1;
+    }
     return 0;
   }
 

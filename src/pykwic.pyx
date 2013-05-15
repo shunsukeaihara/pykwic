@@ -33,6 +33,7 @@ cdef class Kwic:
          self._esary.getResult(indexes,result)
          cdef int num = result.size()
          ret = []
-         for i in xrange(num):#遅いのでcdefに変える
+         cdef int i
+         for i in xrange(num):
              ret.append((result[i].first.c_str().decode('utf8'),result[i].second.c_str().decode('utf8')))
          return ret

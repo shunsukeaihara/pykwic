@@ -68,6 +68,9 @@ namespace esary{
     int nodeNum;
     std::ostringstream what_;
 
+
+    int build_sa();
+    int build_esa();
     void bsearch(const std::vector<UChar32>& query,
                  uint32_t& beg, uint32_t& half, uint32_t& size,
                  uint32_t& match, uint32_t& lmatch, uint32_t& rmatch,

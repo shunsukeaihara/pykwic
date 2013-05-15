@@ -27,5 +27,5 @@ setup(
         ],language="c++",
                             ),
     test_suite='nose.collector',
-    tests_require=['Nose'],
+    tests_require=['Nose','cython'],
     )
