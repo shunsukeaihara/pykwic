@@ -25,7 +25,7 @@ cdef class Kwic:
      def load(self,fname):
          return self._esary.load(fname)
 
-     def search(self,ustring):
+     cpdef search(self,unicode ustring):
          cdef bytes st = ustring.encode('utf8')
          cdef vector[unsigned int] indexes
          self._esary.search(st,indexes)

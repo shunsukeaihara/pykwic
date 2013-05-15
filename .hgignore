@@ -8,3 +8,4 @@ syntax: glob
 build
 pykwic.egg-*
 distribute-*
+dist

@@ -22,10 +22,10 @@ setup(
             include_dirs=['lib','/opt/local/include','/usr/local/include'],
             library_dirs=['/opt/local/lib','/usr/local/lib'],
             libraries =['pthread','m','icui18n','icuuc','icudata'],
-            #extra_compile_args = ['-g','-O0']
             ),
         ],language="c++",
                             ),
+    include_package_data=True,
     test_suite='nose.collector',
     tests_require=['Nose','cython'],
     )
