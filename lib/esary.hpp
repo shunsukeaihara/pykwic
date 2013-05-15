@@ -36,6 +36,7 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 #include <unicode/unistr.h>
 #include <unicode/uchar.h>
@@ -61,7 +62,7 @@ namespace esary{
     std::vector<UChar32> T;
     std::vector<uint32_t>  SA;     // suffix array
     std::vector<uint32_t>  L;     // left boundaries of internal node
-    std::vector<uint32_t>  R;     // right boundaries of internal node 
+    std::vector<uint32_t>  R;     // right boundaries of internal node
     std::vector<uint32_t>  D;     // depths of internal node
     std::vector<uint32_t> RANK;
     int nodeNum;
@@ -88,7 +89,7 @@ namespace esary{
     }
 
     template<class T> int write(const T v, const char* vname, std::ofstream& ofs){
-      if (!ofs.write((const char*)(&v), sizeof(T))){
+      if (!ofs.write((const char*)(&v), sizeof(int32_t))){
         what_ << "write error:" << vname;
         return -1;
       }
@@ -109,7 +110,7 @@ namespace esary{
     }
 
     template<class T> int read(T& v, const char* vname, std::ifstream& ifs){
-      if (!ifs.read((char*)(&v), sizeof(T))){
+      if (!ifs.read((char*)(&v), sizeof(int32_t))){
         what_ << "read error:" << vname;
         return -1;
       }

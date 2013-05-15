@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
-from distutils.core import setup
+import distribute_setup
+distribute_setup.use_setuptools()
+
+from setuptools import setup
 from Cython.Build import cythonize
-from distutils.extension import Extension
+from setuptools.extension import Extension
+import multiprocessing
 import sys
 sys.path.append('./src')
+
 
 setup(
     name="pykwic",
@@ -17,7 +22,10 @@ setup(
             include_dirs=['lib','/opt/local/include','/usr/local/include'],
             library_dirs=['/opt/local/lib','/usr/local/lib'],
             libraries =['pthread','m','icui18n','icuuc','icudata'],
+            extra_compile_args = ['-g','-O0']
             ),
         ],language="c++",
-        )
+                            ),
+    test_suite='nose.collector',
+    tests_require=['Nose'],
     )

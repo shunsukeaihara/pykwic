@@ -31,7 +31,6 @@
 #include "sais.hxx"
 #include "esa.hxx"
 #include "esary.hpp"
-#include <iostream>
 
 namespace esary {
 
@@ -111,7 +110,7 @@ namespace esary {
     int32_t convertedLength = us.extract(0, us.length(), 0, "UTF-8");
     char* result = new char[convertedLength + 1];
     us.extract(0, us.length(), result, "UTF-8");
-    std::string s=result;
+    std::string s = result;
     delete[] result;
     return s;
   }
@@ -141,7 +140,7 @@ namespace esary {
     int32_t convertedLength = us.extract(0, us.length(), 0, "UTF-8");
     char* result = new char[convertedLength + 1];
     us.extract(0, us.length(), result, "UTF-8");
-    std::string s=result;
+    std::string s = result;
     delete[] result;
     return s;
   }
@@ -238,6 +237,7 @@ namespace esary {
     if (write(R, "R", ofs) == -1) return -1;
     if (write(D, "D", ofs) == -1) return -1;
     if (write(nodeNum, "nodeNum", ofs) == -1) return -1;
+    ofs.close();
     return 0;
   }
 
@@ -247,6 +247,13 @@ namespace esary {
       what_ << "cannot open " << fileName;
       return -1;
     }
+
+    T.clear();
+    SA.clear();
+    L.clear();
+    R.clear();
+    D.clear();
+
     if (read(T, "T", ifs) == -1) return -1;
     if (read(SA, "SA", ifs) == -1) return -1;
     if (read(L, "L", ifs) == -1) return -1;
