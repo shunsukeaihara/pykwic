@@ -50,13 +50,20 @@ namespace esary{
     ESary();
     ~ESary();
     void addLine(const char* line);
-    int build();
+    int build_sa();
+    int build_esa();
     void search(const char* query, std::vector<uint32_t>& indexes);
     void getResult(std::vector<uint32_t>& indexes, std::vector<std::pair<std::string,std::string> > & result);
     void getResultSuffix(std::vector<uint32_t>& indexes, std::vector<std::string>& result);
 
-    int load(const char* fileName);
+    int load(const char* fileName,int flag);
     int save(const char* fileName);
+
+    int getNodeNum(){
+      return nodeNum;
+    }
+
+    std::pair<std::string,uint32_t> findMaximalSubstring(uint32_t& pos);
 
   private:
     std::vector<UChar32> T;
@@ -69,8 +76,6 @@ namespace esary{
     std::ostringstream what_;
 
 
-    int build_sa();
-    int build_esa();
     void bsearch(const std::vector<UChar32>& query,
                  uint32_t& beg, uint32_t& half, uint32_t& size,
                  uint32_t& match, uint32_t& lmatch, uint32_t& rmatch,

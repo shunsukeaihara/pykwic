@@ -51,10 +51,6 @@ namespace esary {
     T.push_back(1);//add Delimiter
   }
 
-  int ESary::build(){
-    return build_sa();
-  }
-
   int ESary::build_esa(){
     int n = T.size();
     if(n==0)return -1;
@@ -169,6 +165,7 @@ namespace esary {
 
 
   void ESary::search(const char* query, std::vector<uint32_t>& indexes){
+    if (T.size()==0 || T.size()!=SA.size())return;
     UnicodeString str(query, "UTF-8");
     StringCharacterIterator it(str);
     std::vector<UChar32> queryVec;
@@ -247,23 +244,50 @@ namespace esary {
     }
   }
 
+
+  std::pair<std::string,uint32_t> ESary::findMaximalSubstring(uint32_t& pos){
+    for (; pos < nodeNum; pos++){
+      uint32_t c = RANK[R[pos]-1] - RANK[L[pos]];
+      if (D[pos] > 0 && c > 0) {
+        int flag = 0;
+        UnicodeString us;
+        for(uint32_t i =SA[L[pos]];i<SA[L[pos]]+D[pos];++i){
+          if(T[i]==1){
+            flag=1;
+            break;
+          }
+          us+=T[i];
+        }
+        if(flag==1)continue;
+        int32_t convertedLength = us.extract(0, us.length(), 0, "UTF-8");
+        char* result = new char[convertedLength + 1];
+        us.extract(0, us.length(), result, "UTF-8");
+        std::string s = result;
+        delete[] result;
+        ++pos;
+        return std::pair<std::string,int>(s,c+1);
+      }
+    }
+    return std::pair<std::string,int>(std::string(),0);
+  }
+
   int ESary::save(const char* fileName){
     std::ofstream ofs(fileName);
     if (!ofs){
       what_ << "cannot open " << fileName;
       return -1;
   }
+    if (write(nodeNum, "nodeNum", ofs) == -1) return -1;
     if (write(T, "T", ofs) == -1) return -1;
     if (write(SA, "SA", ofs) == -1) return -1;
     if (write(L, "L", ofs) == -1) return -1;
     if (write(R, "R", ofs) == -1) return -1;
     if (write(D, "D", ofs) == -1) return -1;
-    if (write(nodeNum, "nodeNum", ofs) == -1) return -1;
     ofs.close();
     return 0;
   }
 
-  int ESary::load(const char* fileName){
+  int ESary::load(const char* fileName,int flag){
     std::ifstream ifs(fileName);
     if (!ifs){
       what_ << "cannot open " << fileName;
@@ -275,13 +299,16 @@ namespace esary {
     L.clear();
     R.clear();
     D.clear();
-
+    if (read(nodeNum, "nodeNum", ifs) == -1) return -1;
+    if(flag==1&&nodeNum==0){
+      what_ << "This file is not for Enhanced Suffix Array" << std::endl;
+      return -1;
+    }
     if (read(T, "T", ifs) == -1) return -1;
     if (read(SA, "SA", ifs) == -1) return -1;
     if (read(L, "L", ifs) == -1) return -1;
     if (read(R, "R", ifs) == -1) return -1;
     if (read(D, "D", ifs) == -1) return -1;
-    if (read(nodeNum, "nodeNum", ifs) == -1) return -1;
     return 0;
   }
 
