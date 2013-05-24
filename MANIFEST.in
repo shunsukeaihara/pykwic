@@ -1,2 +1,3 @@
 recursive-include lib *.cpp *.hpp *.hxx
 recursive-include src *.pyx *.pxd
+include distribute_setup.py

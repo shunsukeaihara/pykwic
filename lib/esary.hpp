@@ -38,11 +38,6 @@
 #include <sstream>
 #include <iostream>
 
-#include <unicode/unistr.h>
-#include <unicode/uchar.h>
-#include <unicode/schriter.h>
-
-
 namespace esary{
 
   class ESary{
@@ -66,7 +61,7 @@ namespace esary{
     std::pair<std::string,uint32_t> findMaximalSubstring(uint32_t& pos);
 
   private:
-    std::vector<UChar32> T;
+    std::vector<uint32_t> T;
     std::vector<uint32_t>  SA;     // suffix array
     std::vector<uint32_t>  L;     // left boundaries of internal node
     std::vector<uint32_t>  R;     // right boundaries of internal node
@@ -76,14 +71,17 @@ namespace esary{
     std::ostringstream what_;
 
 
-    void bsearch(const std::vector<UChar32>& query,
+    void bsearch(const std::vector<uint32_t>& query,
                  uint32_t& beg, uint32_t& half, uint32_t& size,
                  uint32_t& match, uint32_t& lmatch, uint32_t& rmatch,
                  const int state);
-    int compare(const uint32_t ind, const std::vector<UChar32>& query, uint32_t& match) const;
+    int compare(const uint32_t ind, const std::vector<uint32_t>& query, uint32_t& match) const;
 
     std::string getPrefix(const uint32_t index);
     std::string getSuffix(const uint32_t index);
+
+    void strutftoucs(const std::string& src,std::vector<uint32_t>& dest);
+    void strucstoutf(const std::vector<uint32_t>& src,std::string& dest);
 
     template<class T> int write(const std::vector<T>& v, const char* vname, std::ofstream& ofs){
       uint32_t size = static_cast<uint32_t>(v.size());

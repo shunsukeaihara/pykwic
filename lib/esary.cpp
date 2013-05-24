@@ -43,10 +43,12 @@ namespace esary {
 
   void ESary::addLine(const char* line){
     //from http://shogo82148.hatenablog.com/entry/20110916/1316172382
-    UnicodeString str(line, "UTF-8");
-    StringCharacterIterator it(str);
-    for(UChar32 uc = it.first32(); uc != it.DONE; uc = it.next32()) {
-      T.push_back(uc);
+    std::vector<uint32_t> ucsvec;
+    std::string utf8string(line);
+    strutftoucs(utf8string,ucsvec);
+
+    for (std::vector<uint32_t>::iterator it = ucsvec.begin(); it != ucsvec.end(); ++it) {
+      T.push_back(*it);
     }
     T.push_back(1);//add Delimiter
   }
@@ -120,17 +122,13 @@ namespace esary {
       return "";
     }
 
-    UnicodeString us;
+    std::vector<uint32_t> ucsvec;
     for(uint32_t i =start_idx;i<index;++i){
-      us+=T[i];
+      ucsvec.push_back(T[i]);
     }
-
-    int32_t convertedLength = us.extract(0, us.length(), 0, "UTF-8");
-    char* result = new char[convertedLength + 1];
-    us.extract(0, us.length(), result, "UTF-8");
-    std::string s = result;
-    delete[] result;
-    return s;
+    std::string result;
+    strucstoutf(ucsvec,result);
+    return result;
   }
 
 
@@ -151,27 +149,22 @@ namespace esary {
         break;
       }
     }
-    UnicodeString us;
+
+    std::vector<uint32_t> ucsvec;
     for(uint32_t i =index;i<=end_idx;++i){
-      us+=T[i];
+      ucsvec.push_back(T[i]);
     }
-    int32_t convertedLength = us.extract(0, us.length(), 0, "UTF-8");
-    char* result = new char[convertedLength + 1];
-    us.extract(0, us.length(), result, "UTF-8");
-    std::string s = result;
-    delete[] result;
-    return s;
+    std::string result;
+    strucstoutf(ucsvec,result);
+    return result;
   }
 
 
   void ESary::search(const char* query, std::vector<uint32_t>& indexes){
     if (T.size()==0 || T.size()!=SA.size())return;
-    UnicodeString str(query, "UTF-8");
-    StringCharacterIterator it(str);
-    std::vector<UChar32> queryVec;
-    for(UChar32 uc = it.first32(); uc != it.DONE; uc = it.next32()) {
-      queryVec.push_back(uc);
-    }
+    std::vector<uint32_t> queryVec;
+    std::string utf8string(query);
+    strutftoucs(utf8string,queryVec);
 
     indexes.clear();
     // Binary Search of the SA position containing a query as a prefix
@@ -192,6 +185,8 @@ namespace esary {
     uint32_t lmatch2 = 0;
     bsearch(queryVec, lbeg, lhalf, lsize, lmatch2, llmatch, lrmatch, 1);
 
+    if(size==0)return;//if not found
+
   // Upper Bound
     uint32_t rbeg    = beg + half + 1;
     uint32_t rsize   = size - half - 1;
@@ -209,7 +204,7 @@ namespace esary {
   }
 
   /// Return -1 if text[ind...] < query, or return 1 otherwise
-  int ESary::compare(const uint32_t ind, const std::vector<UChar32>& query, uint32_t& match) const{
+  int ESary::compare(const uint32_t ind, const std::vector<uint32_t>& query, uint32_t& match) const{
     while (match < query.size() && match + ind < T.size()){
       if (T[ind+match] != query[match]){
         return (int)T[ind+match] - query[match];
@@ -223,13 +218,14 @@ namespace esary {
     }
   }
 
-  void ESary::bsearch(const std::vector<UChar32>& query,
+  void ESary::bsearch(const std::vector<uint32_t>& query,
                       uint32_t& beg, uint32_t& half, uint32_t& size, 
                       uint32_t& match, uint32_t& lmatch, uint32_t& rmatch, 
                       const int state){
     half = size/2;
     for (; size > 0; size = half, half /= 2){
       match = std::min(lmatch, rmatch);
+      std::cout << beg << "," << half << ',' << size << std::endl;
       int r = compare(SA[beg + half], query, match);
       if (r < 0 || (r == 0 && state==2)){
         beg += half + 1;
@@ -250,20 +246,19 @@ namespace esary {
       uint32_t c = RANK[R[pos]-1] - RANK[L[pos]];
       if (D[pos] > 0 && c > 0) {
         int flag = 0;
-        UnicodeString us;
+
+        std::vector<uint32_t> ucsvec;
         for(uint32_t i =SA[L[pos]];i<SA[L[pos]]+D[pos];++i){
           if(T[i]==1){
             flag=1;
             break;
           }
-          us+=T[i];
+          ucsvec.push_back(T[i]);
         }
+
         if(flag==1)continue;
-        int32_t convertedLength = us.extract(0, us.length(), 0, "UTF-8");
-        char* result = new char[convertedLength + 1];
-        us.extract(0, us.length(), result, "UTF-8");
-        std::string s = result;
-        delete[] result;
+        std::string s;
+        strucstoutf(ucsvec,s);
         ++pos;
         return std::pair<std::string,int>(s,c+1);
       }
@@ -312,5 +307,92 @@ namespace esary {
     return 0;
   }
 
+  /**
+   * Convert a UTF-8 string into a UCS-4 vector.
+   */
+  void ESary::strutftoucs(const std::string& src,
+                          std::vector<uint32_t>& dest) {
+    size_t size = src.size();
+    size_t ri = 0;
+    while (ri < size) {
+      uint32_t c = (unsigned char)src[ri];
+      if (c >= 0xc0 && c < 0x80) {
+        dest.push_back(c);
+      } else if (c < 0xe0) {
+        if (ri + 1 < size) {
+          dest.push_back(((c & 0x1f) << 6) | (src[ri+1] & 0x3f));
+          ri++;
+        }
+      } else if (c < 0xf0) {
+      if (ri + 2 < size) {
+        dest.push_back(((c & 0x0f) << 12) | ((src[ri+1] & 0x3f) << 6) |
+                        (src[ri+2] & 0x3f));
+        ri += 2;
+      }
+      } else if (c < 0xf8) {
+        if (ri + 3 < size) {
+          dest.push_back(((c & 0x07) << 18) | ((src[ri+1] & 0x3f) << 12) |
+                          ((src[ri+2] & 0x3f) << 6) | (src[ri+3] & 0x3f));
+          ri += 3;
+        }
+      } else if (c < 0xfc) {
+        if (ri + 4 < size) {
+          dest.push_back(((c & 0x03) << 24) | ((src[ri+1] & 0x3f) << 18) |
+                          ((src[ri+2] & 0x3f) << 12) | ((src[ri+3] & 0x3f) << 6) |
+                          (src[ri+4] & 0x3f));
+        ri += 4;
+        }
+      } else if (c < 0xfe) {
+        if (ri + 5 < size) {
+          dest.push_back(((c & 0x01) << 30) | ((src[ri+1] & 0x3f) << 24) |
+                          ((src[ri+2] & 0x3f) << 18) | ((src[ri+3] & 0x3f) << 12) |
+                          ((src[ri+4] & 0x3f) << 6) | (src[ri+5] & 0x3f));
+          ri += 5;
+        }
+      }
+      ri++;
+    }
+  }
+
+  /**
+   * Convert a UCS-4 vector into a UTF-8 string.
+   */
+  void ESary::strucstoutf(const std::vector<uint32_t>& src,
+                          std::string& dest) {
+    std::vector<uint32_t>::const_iterator it = src.begin();
+    std::vector<uint32_t>::const_iterator itend = src.end();
+    while (it != itend) {
+      uint32_t c = *it;
+      if (c < 0x80) {
+        dest.append(1, c);
+      } else if (c < 0x800) {
+        dest.append(1, 0xc0 | (c >> 6));
+        dest.append(1, 0x80 | (c & 0x3f));
+      } else if (c < 0x10000) {
+        dest.append(1, 0xe0 | (c >> 12));
+        dest.append(1, 0x80 | ((c & 0xfff) >> 6));
+        dest.append(1, 0x80 | (c & 0x3f));
+      } else if (c < 0x200000) {
+        dest.append(1, 0xf0 | (c >> 18));
+        dest.append(1, 0x80 | ((c & 0x3ffff) >> 12));
+        dest.append(1, 0x80 | ((c & 0xfff) >> 6));
+        dest.append(1, 0x80 | (c & 0x3f));
+      } else if (c < 0x4000000) {
+        dest.append(1, 0xf8 | (c >> 24));
+        dest.append(1, 0x80 | ((c & 0xffffff) >> 18));
+        dest.append(1, 0x80 | ((c & 0x3ffff) >> 12));
+        dest.append(1, 0x80 | ((c & 0xfff) >> 6));
+        dest.append(1, 0x80 | (c & 0x3f));
+      } else if (c < 0x80000000) {
+        dest.append(1, 0xfc | (c >> 30));
+        dest.append(1, 0x80 | ((c & 0x3fffffff) >> 24));
+        dest.append(1, 0x80 | ((c & 0xffffff) >> 18));
+        dest.append(1, 0x80 | ((c & 0x3ffff) >> 12));
+        dest.append(1, 0x80 | ((c & 0xfff) >> 6));
+        dest.append(1, 0x80 | (c & 0x3f));
+      }
+      ++it;
+    }
+  }
 
 }//sarray

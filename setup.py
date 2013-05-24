@@ -19,9 +19,7 @@ setup(
         Extension(
             'pykwic',
             ["src/pykwic.pyx","lib/esary.cpp"],
-            include_dirs=['lib','/opt/local/include','/usr/local/include'],
-            library_dirs=['/opt/local/lib','/usr/local/lib'],
-            libraries =['pthread','m','icui18n','icuuc','icudata'],
+            include_dirs=['lib'],
             ),
         ],language="c++",
                             ),
