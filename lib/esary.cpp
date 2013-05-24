@@ -225,7 +225,6 @@ namespace esary {
     half = size/2;
     for (; size > 0; size = half, half /= 2){
       match = std::min(lmatch, rmatch);
-      std::cout << beg << "," << half << ',' << size << std::endl;
       int r = compare(SA[beg + half], query, match);
       if (r < 0 || (r == 0 && state==2)){
         beg += half + 1;
