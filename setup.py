@@ -8,7 +8,7 @@ sys.path.append('./src')
 setup(
     name="pykwic",
     description="KWIC Library for unicode text using Suffix Array.",
-    version="0.03",
+    version="0.04",
     long_description=open('README.rst').read(),
     ext_modules=cythonize([
         Extension(
@@ -17,6 +17,7 @@ setup(
             include_dirs=['lib']),
     ],
           language="c++"),
+    classifiers=["Programming Language :: Python :: 3", "Programming Language :: Python :: 2"],
     author='Shunsuke Aihara',
     url='https://bitbucket.org/aihara/pykwic/',
     license="MIT License",
