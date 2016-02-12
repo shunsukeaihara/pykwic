@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-import distribute_setup
-distribute_setup.use_setuptools()
-
 from setuptools import setup
 from Cython.Build import cythonize
 from setuptools.extension import Extension
