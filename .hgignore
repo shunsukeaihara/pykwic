@@ -9,3 +9,5 @@ build
 pykwic.egg-*
 distribute-*
 dist
+*.egg
+*.eggs

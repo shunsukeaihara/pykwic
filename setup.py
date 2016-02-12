@@ -22,5 +22,5 @@ setup(
     license="MIT License",
     include_package_data=True,
     test_suite='nose.collector',
-    tests_require=['Nose', 'cython'],
+    tests_require=['Nose', 'Cython', 'six'],
 )
