@@ -44,13 +44,15 @@ namespace esary{
   public:
     ESary();
     ~ESary();
-    void addLine(const char* line);
+    void addLine(std::vector<int>& line);
     int build_sa();
     int build_esa();
-    void search(const char* query, std::vector<uint32_t>& indexes);
-    void getResult(std::vector<uint32_t>& indexes, std::vector<std::pair<std::string,std::string> > & result);
-    void getResultSuffix(std::vector<uint32_t>& indexes, std::vector<std::string>& result);
+    void search(std::vector<int>& query, std::vector<uint32_t>& indexes);
+    void getResults(std::vector<uint32_t>& indexes, std::vector<std::pair<std::vector<int>*, std::vector<int>*> > & result);
+    void freeResults(std::vector<std::pair<std::vector<int>*, std::vector<int>*> > & results);
 
+    void freeIntVec(std::vector<int>* vec);
+    
     int load(const char* fileName,int flag);
     int save(const char* fileName);
 
@@ -58,7 +60,7 @@ namespace esary{
       return nodeNum;
     }
 
-    std::pair<std::string,uint32_t> findMaximalSubstring(uint32_t& pos);
+    std::pair<std::vector<int>*,uint32_t> findMaximalSubstring(uint32_t& pos);
 
   private:
     std::vector<uint32_t> T;
@@ -77,11 +79,8 @@ namespace esary{
                  const int state);
     int compare(const uint32_t ind, const std::vector<uint32_t>& query, uint32_t& match) const;
 
-    std::string getPrefix(const uint32_t index);
-    std::string getSuffix(const uint32_t index);
-
-    void strutftoucs(const std::string& src,std::vector<uint32_t>& dest);
-    void strucstoutf(const std::vector<uint32_t>& src,std::string& dest);
+    void getPrefix(const uint32_t index, std::vector<int>* ret);
+    void getSuffix(const uint32_t index, std::vector<int>* ret);
 
     template<class T> int write(const std::vector<T>& v, const char* vname, std::ofstream& ofs){
       uint32_t size = static_cast<uint32_t>(v.size());

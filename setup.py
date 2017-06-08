@@ -19,9 +19,9 @@ setup(
           language="c++"),
     classifiers=["Programming Language :: Python :: 3", "Programming Language :: Python :: 2"],
     author='Shunsuke Aihara',
-    url='https://bitbucket.org/aihara/pykwic/',
+    url='https://github.com/shunsukeaihara/pykwic',
     license="MIT License",
     include_package_data=True,
     test_suite='nose.collector',
-    tests_require=['Nose', 'Cython', 'six'],
+    tests_require=['Nose', 'Cython', 'six', 'codepoints'],
 )

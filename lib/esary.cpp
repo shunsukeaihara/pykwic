@@ -41,14 +41,9 @@ namespace esary {
   }
 
 
-  void ESary::addLine(const char* line){
-    //from http://shogo82148.hatenablog.com/entry/20110916/1316172382
-    std::vector<uint32_t> ucsvec;
-    std::string utf8string(line);
-    strutftoucs(utf8string,ucsvec);
-
-    for (std::vector<uint32_t>::iterator it = ucsvec.begin(); it != ucsvec.end(); ++it) {
-      T.push_back(*it);
+  void ESary::addLine(std::vector<int>& line){
+    for (std::vector<int>::iterator it = line.begin(); it != line.end(); ++it) {
+      T.push_back((uint32_t)*it);
     }
     T.push_back(1);//add Delimiter
   }
@@ -101,14 +96,30 @@ namespace esary {
     return 0;
   }
 
-  void ESary::getResult(std::vector<uint32_t>& indexes, std::vector<std::pair<std::string,std::string> > & result){
+  void ESary::getResults(std::vector<uint32_t>& indexes, std::vector<std::pair<std::vector<int>*, std::vector<int>*> > & result){
     result.clear();
     for (std::vector<uint32_t>::iterator it = indexes.begin(); it != indexes.end(); ++it) {
-      result.push_back(std::pair<std::string,std::string>(getPrefix(*it),getSuffix(*it)));
+      std::vector<int>* first = new std::vector<int>();
+      std::vector<int>* second = new std::vector<int>();
+      getPrefix(*it, first);
+      getSuffix(*it, second);
+      result.push_back(std::pair<std::vector<int>*, std::vector<int>*>(first, second));
+    }
+  }
+  
+  void ESary::freeResults(std::vector<std::pair<std::vector<int>*, std::vector<int>*> > & results){
+    for (std::vector<std::pair<std::vector<int>*, std::vector<int>*> >::iterator it = results.begin(); it != results.end(); ++it) {
+      delete it->first;
+      delete it->second;
     }
   }
 
-  std::string ESary::getPrefix(const uint32_t index){
+  void ESary::freeIntVec(std::vector<int>* vec){
+    delete vec;
+  }
+  
+
+  void ESary::getPrefix(const uint32_t index, std::vector<int>* ret){
     uint32_t start_idx = index;
     //search backward
     for(;start_idx>0;--start_idx){
@@ -119,28 +130,16 @@ namespace esary {
     }
 
     if(start_idx>=index){
-      return "";
+      return;
     }
 
-    std::vector<uint32_t> ucsvec;
-    for(uint32_t i =start_idx;i<index;++i){
-      ucsvec.push_back(T[i]);
+    for(uint32_t i=start_idx;i<index;++i){
+      ret->push_back((int)T[i]);
     }
-    std::string result;
-    strucstoutf(ucsvec,result);
-    return result;
+    return;
   }
 
-
-
-  void ESary::getResultSuffix(std::vector<uint32_t>& indexes,std::vector<std::string> & result){
-    result.clear();
-    for (std::vector<uint32_t>::iterator it = indexes.begin(); it != indexes.end(); ++it) {
-      result.push_back(getSuffix(*it));
-    }
-  }
-
-  std::string ESary::getSuffix(const uint32_t index){
+  void ESary::getSuffix(const uint32_t index, std::vector<int>* ret){
     uint32_t end_idx;
     //search forward
     for(end_idx=index;end_idx<T.size();++end_idx){
@@ -150,22 +149,20 @@ namespace esary {
       }
     }
 
-    std::vector<uint32_t> ucsvec;
     for(uint32_t i =index;i<=end_idx;++i){
-      ucsvec.push_back(T[i]);
+      ret->push_back((int)T[i]);
     }
-    std::string result;
-    strucstoutf(ucsvec,result);
-    return result;
+    return;
   }
 
 
-  void ESary::search(const char* query, std::vector<uint32_t>& indexes){
+  void ESary::search(std::vector<int>& query, std::vector<uint32_t>& indexes){
     if (T.size()==0 || T.size()!=SA.size())return;
     std::vector<uint32_t> queryVec;
-    std::string utf8string(query);
-    strutftoucs(utf8string,queryVec);
-
+    for (std::vector<int>::iterator it = query.begin(); it != query.end(); ++it) {
+      queryVec.push_back((uint32_t)*it);
+    }
+    
     indexes.clear();
     // Binary Search of the SA position containing a query as a prefix
     uint32_t beg    = 0;
@@ -240,29 +237,33 @@ namespace esary {
   }
 
 
-  std::pair<std::string,uint32_t> ESary::findMaximalSubstring(uint32_t& pos){
+  std::pair<std::vector<int>*, uint32_t> ESary::findMaximalSubstring(uint32_t& pos){
     for (; pos < nodeNum; pos++){
       uint32_t c = RANK[R[pos]-1] - RANK[L[pos]];
-      if (D[pos] > 0 && c > 0) {
+      int len = D[pos];
+      if (len > 0 && c > 0) {
         int flag = 0;
-
-        std::vector<uint32_t> ucsvec;
-        for(uint32_t i =SA[L[pos]];i<SA[L[pos]]+D[pos];++i){
-          if(T[i]==1){
+        int start = SA[L[pos]];
+        std::vector<int>* ret = new std::vector<int>();
+        for(uint32_t i=start;i<start+len;++i){
+          if(T[i]==1 && i != start){
             flag=1;
             break;
           }
-          ucsvec.push_back(T[i]);
+          if (T[i]!=1){
+            ret->push_back((int)T[i]);
+          }
         }
 
-        if(flag==1)continue;
-        std::string s;
-        strucstoutf(ucsvec,s);
-        ++pos;
-        return std::pair<std::string,int>(s,c+1);
+        if(flag==1 or ret->size() == 0){
+          delete ret;
+          continue;
+        }
+        pos++;
+        return std::pair<std::vector<int>*, int>(ret,c+1);
       }
     }
-    return std::pair<std::string,int>(std::string(),0);
+    return std::pair<std::vector<int>*, int>(new std::vector<int>(), 0);
   }
 
   int ESary::save(const char* fileName){
@@ -304,94 +305,6 @@ namespace esary {
     if (read(R, "R", ifs) == -1) return -1;
     if (read(D, "D", ifs) == -1) return -1;
     return 0;
-  }
-
-  /**
-   * Convert a UTF-8 string into a UCS-4 vector.
-   */
-  void ESary::strutftoucs(const std::string& src,
-                          std::vector<uint32_t>& dest) {
-    size_t size = src.size();
-    size_t ri = 0;
-    while (ri < size) {
-      uint32_t c = (unsigned char)src[ri];
-      if (c >= 0xc0 && c < 0x80) {
-        dest.push_back(c);
-      } else if (c < 0xe0) {
-        if (ri + 1 < size) {
-          dest.push_back(((c & 0x1f) << 6) | (src[ri+1] & 0x3f));
-          ri++;
-        }
-      } else if (c < 0xf0) {
-      if (ri + 2 < size) {
-        dest.push_back(((c & 0x0f) << 12) | ((src[ri+1] & 0x3f) << 6) |
-                        (src[ri+2] & 0x3f));
-        ri += 2;
-      }
-      } else if (c < 0xf8) {
-        if (ri + 3 < size) {
-          dest.push_back(((c & 0x07) << 18) | ((src[ri+1] & 0x3f) << 12) |
-                          ((src[ri+2] & 0x3f) << 6) | (src[ri+3] & 0x3f));
-          ri += 3;
-        }
-      } else if (c < 0xfc) {
-        if (ri + 4 < size) {
-          dest.push_back(((c & 0x03) << 24) | ((src[ri+1] & 0x3f) << 18) |
-                          ((src[ri+2] & 0x3f) << 12) | ((src[ri+3] & 0x3f) << 6) |
-                          (src[ri+4] & 0x3f));
-        ri += 4;
-        }
-      } else if (c < 0xfe) {
-        if (ri + 5 < size) {
-          dest.push_back(((c & 0x01) << 30) | ((src[ri+1] & 0x3f) << 24) |
-                          ((src[ri+2] & 0x3f) << 18) | ((src[ri+3] & 0x3f) << 12) |
-                          ((src[ri+4] & 0x3f) << 6) | (src[ri+5] & 0x3f));
-          ri += 5;
-        }
-      }
-      ri++;
-    }
-  }
-
-  /**
-   * Convert a UCS-4 vector into a UTF-8 string.
-   */
-  void ESary::strucstoutf(const std::vector<uint32_t>& src,
-                          std::string& dest) {
-    std::vector<uint32_t>::const_iterator it = src.begin();
-    std::vector<uint32_t>::const_iterator itend = src.end();
-    while (it != itend) {
-      uint32_t c = *it;
-      if (c < 0x80) {
-        dest.append(1, c);
-      } else if (c < 0x800) {
-        dest.append(1, 0xc0 | (c >> 6));
-        dest.append(1, 0x80 | (c & 0x3f));
-      } else if (c < 0x10000) {
-        dest.append(1, 0xe0 | (c >> 12));
-        dest.append(1, 0x80 | ((c & 0xfff) >> 6));
-        dest.append(1, 0x80 | (c & 0x3f));
-      } else if (c < 0x200000) {
-        dest.append(1, 0xf0 | (c >> 18));
-        dest.append(1, 0x80 | ((c & 0x3ffff) >> 12));
-        dest.append(1, 0x80 | ((c & 0xfff) >> 6));
-        dest.append(1, 0x80 | (c & 0x3f));
-      } else if (c < 0x4000000) {
-        dest.append(1, 0xf8 | (c >> 24));
-        dest.append(1, 0x80 | ((c & 0xffffff) >> 18));
-        dest.append(1, 0x80 | ((c & 0x3ffff) >> 12));
-        dest.append(1, 0x80 | ((c & 0xfff) >> 6));
-        dest.append(1, 0x80 | (c & 0x3f));
-      } else if (c < 0x80000000) {
-        dest.append(1, 0xfc | (c >> 30));
-        dest.append(1, 0x80 | ((c & 0x3fffffff) >> 24));
-        dest.append(1, 0x80 | ((c & 0xffffff) >> 18));
-        dest.append(1, 0x80 | ((c & 0x3ffff) >> 12));
-        dest.append(1, 0x80 | ((c & 0xfff) >> 6));
-        dest.append(1, 0x80 | (c & 0x3f));
-      }
-      ++it;
-    }
   }
 
 }//sarray
