@@ -8,7 +8,7 @@ sys.path.append('./src')
 setup(
     name="pykwic",
     description="KWIC Library for unicode text using Suffix Array.",
-    version="0.04",
+    version="0.1",
     long_description=open('README.rst').read(),
     ext_modules=cythonize([
         Extension(
