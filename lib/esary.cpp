@@ -246,7 +246,7 @@ namespace esary {
         int start = SA[L[pos]];
         std::vector<int>* ret = new std::vector<int>();
         for(uint32_t i=start;i<start+len;++i){
-          if(T[i]==1 && i != start){
+          if(T[i]==1 && (i != start || i != start+len-1)){
             flag=1;
             break;
           }
