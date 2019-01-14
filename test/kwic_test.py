@@ -5,7 +5,6 @@ import hashlib
 import os
 import random
 from datetime import datetime
-import unicodedata
 from six import unichr, b, u
 
 
