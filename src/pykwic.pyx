@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # distutils: language = c++
 from __future__ import unicode_literals
 from libcpp.string cimport string
